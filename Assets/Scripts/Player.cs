@@ -6,8 +6,10 @@ public class Player : MonoBehaviour
 {
     [SerializeField]
     private GameObject _camera;
+    [SerializeField]
+    private GameObject _WinScreen;
 
-    private int _currentPosition = 0;
+    private int _nextPosition = 0;
     private bool _hasMovedOnce = false;
     private float _camHeightOffset = 4.5f;
     private float _nextCamPos = 0f;
@@ -61,33 +63,68 @@ public class Player : MonoBehaviour
         }
     }
 
-    async void MovedBackFalse()
-    {
-        await System.Threading.Tasks.Task.Delay(100);
+    //async void MovedBackFalse()
+    //{
+    //    await System.Threading.Tasks.Task.Delay(100);
 
-    }
+    //}
 
     private void MoveSteps(int moves)
     {
-
-        if (!_hasMovedOnce)
+        try
         {
-            _currentPosition = 0;
-        }
-        else
-        {
-            moves = moves + 1;
-        }
-        _currentPosition += moves;
+            int previousPosition = _nextPosition;
 
-        Debug.Log("Curr" + _currentPosition + "move" + moves);
-        transform.position = new Vector3(GameManager.Instance.Lands[_currentPosition].transform.position.x, GameManager.Instance.Lands[_currentPosition].transform.position.y + 2, GameManager.Instance.Lands[_currentPosition].transform.position.z);
-        CalculateYDistance(transform.position);
-        _hasMovedOnce = true;
+            if (!_hasMovedOnce)
+            {
+                _nextPosition = 0;
+            }
+            else
+            {
+                moves = moves + 1;
+            }
+
+            _nextPosition += moves;
+
+            Debug.Log("Curr" + _nextPosition + "move" + moves);
+
+            if(_nextPosition + 1 == 100)
+            {
+                transform.position = new Vector3(GameManager.Instance.Lands[_nextPosition].transform.position.x, GameManager.Instance.Lands[_nextPosition].transform.position.y + 2, GameManager.Instance.Lands[_nextPosition].transform.position.z);
+                CalculateYDistance(transform.position);
+                _hasMovedOnce = true;
+                DelayedWin();
+            }
+
+            if (_nextPosition >= 96 && _nextPosition <= 99 && moves >= 1 && moves <= 5)
+            {
+                transform.position = new Vector3(GameManager.Instance.Lands[_nextPosition].transform.position.x, GameManager.Instance.Lands[_nextPosition].transform.position.y + 2, GameManager.Instance.Lands[_nextPosition].transform.position.z);
+                CalculateYDistance(transform.position);
+                _hasMovedOnce = true;
+            }
+            else if (_nextPosition <= 95)
+            {
+                transform.position = new Vector3(GameManager.Instance.Lands[_nextPosition].transform.position.x, GameManager.Instance.Lands[_nextPosition].transform.position.y + 2, GameManager.Instance.Lands[_nextPosition].transform.position.z);
+                CalculateYDistance(transform.position);
+                _hasMovedOnce = true;
+            }
+            else
+            {
+                _nextPosition = previousPosition; // Reset the current position to the previous position
+                throw new Exception("Invalid move");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log("Roll the dice again: " + ex.Message);
+            // Display your message or take any other appropriate action
+        }
     }
+
+
     private void MoveForward(int moves)
     {
-        _currentPosition = moves;
+        _nextPosition = moves;
         transform.position = new Vector3(GameManager.Instance.Lands[moves].transform.position.x, GameManager.Instance.Lands[moves].transform.position.y + 2, GameManager.Instance.Lands[moves].transform.position.z);
         LateCalculateForward();
     }
@@ -101,7 +138,7 @@ public class Player : MonoBehaviour
     private void MoveBackWard(int moves)
     {
         _movedBack = true;
-        _currentPosition = moves;
+        _nextPosition = moves;
         transform.position = new Vector3(GameManager.Instance.Lands[moves].transform.position.x, GameManager.Instance.Lands[moves].transform.position.y + 2, GameManager.Instance.Lands[moves].transform.position.z);
         LateCalculateBackward();
     }
@@ -109,6 +146,13 @@ public class Player : MonoBehaviour
     {
         await System.Threading.Tasks.Task.Delay(200);
         CalculateYDistance(transform.position);
+    }
+
+    async void DelayedWin()
+    {
+        await System.Threading.Tasks.Task.Delay(1000);
+        _WinScreen.SetActive(true);
+        Time.timeScale = 0f;
     }
 
     private void OnDisable()
