@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class Camera : MonoBehaviour
 {
-    private float _increaseOffsetY = 4f;
-    private float _increaseOffsetZ = 2f;
+    //private float _increaseOffsetY = 6f;
+    //private float _increaseOffsetZ = 3f;    
+    //private float _decreaseOffsetY = -6f;
+    //private float _decreaseOffsetZ = -3f;
+
     private Vector3 _intialPos;
 
     private void OnEnable()
@@ -19,22 +22,28 @@ public class Camera : MonoBehaviour
         _intialPos = transform.position;
     }
 
-    private void Increase()
+    private void Increase(Vector3 changed)
     {
+        //Debug.Log("Increase");
+        float xVal = transform.position.x;
         float yVal = transform.position.y;
         float zVal = transform.position.z;
-        yVal += _increaseOffsetY;
-        zVal += _increaseOffsetZ;
-        transform.position = new Vector3(_intialPos.x, yVal, zVal);
+        xVal += changed.x;
+        yVal += changed.y;
+        zVal += changed.z;
+        transform.position = new Vector3(_intialPos.x, yVal, zVal-2);
     }
 
-    private void Decrease()
+    private void Decrease(Vector3 changed)
     {
+        Debug.Log("Decrease");
+        float xVal = transform.position.x;
         float yVal = transform.position.y;
         float zVal = transform.position.z;
-        yVal -= _increaseOffsetY;
-        zVal -= _increaseOffsetZ;
-        transform.position = new Vector3(_intialPos.x, yVal, zVal);
+        xVal -= changed.x;
+        yVal -= changed.y;
+        zVal -= changed.z;
+        transform.position = new Vector3(10.25f, yVal, zVal);
     }
 
     private void OnDisable()
