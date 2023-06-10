@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private float _prevCamPos = 0f;
     private Vector3 _intialPos;
 
+
     private float _intialXDistanceBetweenPlayerAndCamera = 0f;
     private float _intialYDistanceBetweenPlayerAndCamera = 0f;
     private float _intialZDistanceBetweenPlayerAndCamera = 0f;
@@ -131,7 +132,7 @@ public class Player : MonoBehaviour
 
     async void LateCalculateForward()
     {
-        await System.Threading.Tasks.Task.Delay(200);
+        await System.Threading.Tasks.Task.Delay(50);
         CalculateYDistance(transform.position);
     }
 
@@ -144,7 +145,7 @@ public class Player : MonoBehaviour
     }
     async void LateCalculateBackward()
     {
-        await System.Threading.Tasks.Task.Delay(200);
+        await System.Threading.Tasks.Task.Delay(50);
         CalculateYDistance(transform.position);
     }
 
@@ -152,14 +153,8 @@ public class Player : MonoBehaviour
     {
         await System.Threading.Tasks.Task.Delay(1000);
         _WinScreen.SetActive(true);
-        Time.timeScale = 0f;
     }
 
-    private void OnDisable()
-    {
-        Dice.PlayerMove -= MoveSteps;
-        Ladder.ClimbLadder -= MoveSteps;
-    }
 
     private void CalculateYDistance(Vector3 currentPos)
     {
@@ -183,5 +178,11 @@ public class Player : MonoBehaviour
             Vector3 total = new Vector3(totalDiffX, totalDiffY, totalDiffZ);
             DecreaseCameraHeight?.Invoke(total);
         }
+    }
+    private void OnDisable()
+    {
+        Dice.PlayerMove -= MoveSteps;
+        Ladder.ClimbLadder -= MoveForward;
+        Snake.FallSnake -= MoveBackWard;
     }
 }

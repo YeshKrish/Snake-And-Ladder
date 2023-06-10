@@ -27,7 +27,6 @@ public class UIManger : MonoBehaviour
             _winScreen.SetActive(false);
         }
         SceneManager.LoadScene(0);
-        Time.timeScale = 1f;
         
     }
 
