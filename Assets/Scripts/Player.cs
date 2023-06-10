@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private float _prevCamPos = 0f;
     private Vector3 _intialPos;
 
+    int previousPosition;
 
     private float _intialXDistanceBetweenPlayerAndCamera = 0f;
     private float _intialYDistanceBetweenPlayerAndCamera = 0f;
@@ -74,7 +75,7 @@ public class Player : MonoBehaviour
     {
         try
         {
-            int previousPosition = _nextPosition;
+            previousPosition = _nextPosition;
 
             if (!_hasMovedOnce)
             {
@@ -93,7 +94,6 @@ public class Player : MonoBehaviour
             {
                 transform.position = new Vector3(GameManager.Instance.Lands[_nextPosition].transform.position.x, GameManager.Instance.Lands[_nextPosition].transform.position.y + 2, GameManager.Instance.Lands[_nextPosition].transform.position.z);
                 CalculateYDistance(transform.position);
-                _hasMovedOnce = true;
                 DelayedWin();
             }
 
@@ -125,19 +125,39 @@ public class Player : MonoBehaviour
 
     private void MoveForward(int moves)
     {
+        previousPosition = _nextPosition+1;
+        Debug.Log("PrevPos" + previousPosition + "Moves" + (moves + 1));
+        int distanceBetweenLands = Mathf.Abs(previousPosition - (moves + 1));
         _nextPosition = moves;
         transform.position = new Vector3(GameManager.Instance.Lands[moves].transform.position.x, GameManager.Instance.Lands[moves].transform.position.y + 2, GameManager.Instance.Lands[moves].transform.position.z);
-        LateCalculateForward();
+        Debug.Log("distance" + distanceBetweenLands);
+        if(distanceBetweenLands > 25)
+        {
+            DelayedCalculateForward();
+        }
+        else
+        {
+            LateCalculateForward(); 
+        }
     }
 
     async void LateCalculateForward()
     {
+        Debug.Log("Late");
         await System.Threading.Tasks.Task.Delay(50);
+        CalculateYDistance(transform.position);
+    } 
+    async void DelayedCalculateForward()
+    {
+        Debug.Log("delayed");
+        await System.Threading.Tasks.Task.Delay(2000);
         CalculateYDistance(transform.position);
     }
 
     private void MoveBackWard(int moves)
     {
+        previousPosition = _nextPosition + 1;
+        Debug.Log("PrevPos" + previousPosition + "Moves" + moves);
         _movedBack = true;
         _nextPosition = moves;
         transform.position = new Vector3(GameManager.Instance.Lands[moves].transform.position.x, GameManager.Instance.Lands[moves].transform.position.y + 2, GameManager.Instance.Lands[moves].transform.position.z);
@@ -155,30 +175,27 @@ public class Player : MonoBehaviour
         _WinScreen.SetActive(true);
     }
 
-
     private void CalculateYDistance(Vector3 currentPos)
     {
-        float newCameraAndPlayerDistanceX = Mathf.Abs(currentPos.x - _camera.transform.position.y);
         float newCameraAndPlayerDistanceY = Mathf.Abs(currentPos.y - _camera.transform.position.y);
         float newCameraAndPlayerDistanceZ = Mathf.Abs(currentPos.z - _camera.transform.position.z);
         Debug.Log("newCamera" + newCameraAndPlayerDistanceY + "intial" + _intialYDistanceBetweenPlayerAndCamera);
         if(newCameraAndPlayerDistanceY < _intialYDistanceBetweenPlayerAndCamera)
         {
-            float totalDiffX = Mathf.Abs(newCameraAndPlayerDistanceX - _intialXDistanceBetweenPlayerAndCamera);
             float totalDiffY = Mathf.Abs(newCameraAndPlayerDistanceY - _intialYDistanceBetweenPlayerAndCamera);
             float totalDiffZ = Mathf.Abs(newCameraAndPlayerDistanceZ - _intialZDistanceBetweenPlayerAndCamera);
-            Vector3 total = new Vector3(totalDiffX, totalDiffY, totalDiffZ);
+            Vector3 total = new Vector3(0f, totalDiffY, totalDiffZ);
             IncreaseCameraHeight?.Invoke(total);
         }
         if(newCameraAndPlayerDistanceY > _intialYDistanceBetweenPlayerAndCamera)
         {
-            float totalDiffX = Mathf.Abs(newCameraAndPlayerDistanceX - _intialXDistanceBetweenPlayerAndCamera);
             float totalDiffY = Mathf.Abs(newCameraAndPlayerDistanceY - _intialYDistanceBetweenPlayerAndCamera);
             float totalDiffZ = Mathf.Abs(newCameraAndPlayerDistanceZ - _intialZDistanceBetweenPlayerAndCamera);
-            Vector3 total = new Vector3(totalDiffX, totalDiffY, totalDiffZ);
+            Vector3 total = new Vector3(0f, totalDiffY, totalDiffZ);
             DecreaseCameraHeight?.Invoke(total);
         }
     }
+
     private void OnDisable()
     {
         Dice.PlayerMove -= MoveSteps;

@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System;
 using UnityEngine;
+using System.Threading.Tasks;
 
-public class Dice : MonoBehaviour {
+public class Dice : MonoBehaviour
+{
 
     private Sprite[] diceSides;
 
@@ -12,31 +14,27 @@ public class Dice : MonoBehaviour {
 
     private int _previousMove = 0;
 
-    private float _increaseOffsetY = 7f;
-    private float _increaseOffsetZ = 5f;
-    private Vector3 _intialPos;
+    private bool _isDiceRolling = false;
 
-    private void Start () {
-
-        _intialPos = transform.position;
+    private void Start()
+    {
         rend = GetComponent<SpriteRenderer>();
 
         diceSides = Resources.LoadAll<Sprite>("DiceSides/");
-	}
-
-    private void OnEnable()
-    {
-        Player.IncreaseCameraHeight += Increase;
-        Player.DecreaseCameraHeight += Decrease;
     }
+
 
     private void OnMouseDown()
     {
-        StartCoroutine("RollTheDice");
+        if (!_isDiceRolling)
+        {
+            StartCoroutine(RollTheDice());
+        }
     }
-
     private IEnumerator RollTheDice()
     {
+        _isDiceRolling = true;
+
         int randomDiceSide = 0;
 
         int finalSide = 0;
@@ -49,7 +47,7 @@ public class Dice : MonoBehaviour {
 
             yield return new WaitForSeconds(0.05f);
 
-            
+
         }
 
         _previousMove += randomDiceSide;
@@ -57,34 +55,7 @@ public class Dice : MonoBehaviour {
         PlayerMove?.Invoke(randomDiceSide);
         finalSide = randomDiceSide + 1;
 
-        Debug.Log(finalSide);
-    }
-
-    private void Increase(Vector3 changed)
-    {
-        float xVal = transform.position.x;
-        float yVal = transform.position.y;
-        float zVal = transform.position.z;
-        xVal += changed.x;
-        yVal += changed.y;
-        zVal += changed.z;
-        transform.position = new Vector3(_intialPos.x, yVal, zVal-2);
-    }
-
-    private void Decrease(Vector3 changed)
-    {
-        float xVal = transform.position.x;
-        float yVal = transform.position.y;
-        float zVal = transform.position.z;
-        xVal -= changed.x;
-        yVal -= changed.y;
-        zVal -= changed.z;
-        transform.position = new Vector3(_intialPos.x, yVal, zVal);
-    }
-
-    private void OnDisable()
-    {
-        Player.IncreaseCameraHeight -= Increase;
-        Player.DecreaseCameraHeight -= Decrease;
+        _isDiceRolling = false;
+        //Debug.Log(finalSide);
     }
 }

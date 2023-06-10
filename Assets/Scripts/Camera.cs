@@ -24,11 +24,8 @@ public class Camera : MonoBehaviour
 
     private void Increase(Vector3 changed)
     {
-        //Debug.Log("Increase");
-        float xVal = transform.position.x;
         float yVal = transform.position.y;
         float zVal = transform.position.z;
-        xVal += changed.x;
         yVal += changed.y;
         zVal += changed.z;
         transform.position = new Vector3(_intialPos.x, yVal, zVal-2);
@@ -36,11 +33,8 @@ public class Camera : MonoBehaviour
 
     private void Decrease(Vector3 changed)
     {
-        Debug.Log("Decrease");
-        float xVal = transform.position.x;
         float yVal = transform.position.y;
         float zVal = transform.position.z;
-        xVal -= changed.x;
         yVal -= changed.y;
         zVal -= changed.z;
         transform.position = new Vector3(10.25f, yVal, zVal);

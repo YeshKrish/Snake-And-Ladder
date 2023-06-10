@@ -12,7 +12,6 @@ public class Ladder : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.LogWarning(other.gameObject.transform.name);
         if (other.gameObject.CompareTag("Player"))
         {
             DelayClimb();
