@@ -11,9 +11,6 @@ public class Player : MonoBehaviour
 
     private int _nextPosition = 0;
     private bool _hasMovedOnce = false;
-    private float _camHeightOffset = 4.5f;
-    private float _nextCamPos = 0f;
-    private float _prevCamPos = 0f;
     private Vector3 _intialPos;
 
     int previousPosition;
@@ -43,33 +40,7 @@ public class Player : MonoBehaviour
 
         _hasMovedOnce = false;
         _intialPos = transform.position;
-        _nextCamPos = _intialPos.y + _camHeightOffset;
     }
-
-    private void Update()
-    {
-        //Debug.Log("trans" + transform.position.y + "next" + _nextCamPos);
-        if (transform.position.y > _nextCamPos)
-        {
-            _nextCamPos += _camHeightOffset;
-            //IncreaseCameraHeight?.Invoke();
-        }
-
-        if (_movedBack)
-        {
-            _prevCamPos = transform.position.y - _camHeightOffset;
-            _nextCamPos += _prevCamPos;
-            //DecreaseCameraHeight?.Invoke();
-            _movedBack = false;
-            //MovedBackFalse();
-        }
-    }
-
-    //async void MovedBackFalse()
-    //{
-    //    await System.Threading.Tasks.Task.Delay(100);
-
-    //}
 
     private void MoveSteps(int moves)
     {
@@ -111,14 +82,13 @@ public class Player : MonoBehaviour
             }
             else
             {
-                _nextPosition = previousPosition; // Reset the current position to the previous position
+                _nextPosition = previousPosition;
                 throw new Exception("Invalid move");
             }
         }
         catch (Exception ex)
         {
             Debug.Log("Roll the dice again: " + ex.Message);
-            // Display your message or take any other appropriate action
         }
     }
 

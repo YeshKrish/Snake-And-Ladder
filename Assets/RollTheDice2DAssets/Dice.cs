@@ -56,6 +56,5 @@ public class Dice : MonoBehaviour
         finalSide = randomDiceSide + 1;
 
         _isDiceRolling = false;
-        //Debug.Log(finalSide);
     }
 }

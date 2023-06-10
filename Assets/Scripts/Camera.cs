@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class Camera : MonoBehaviour
 {
-    //private float _increaseOffsetY = 6f;
-    //private float _increaseOffsetZ = 3f;    
-    //private float _decreaseOffsetY = -6f;
-    //private float _decreaseOffsetZ = -3f;
-
     private Vector3 _intialPos;
 
     private void OnEnable()
