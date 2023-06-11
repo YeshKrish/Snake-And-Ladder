@@ -5,14 +5,11 @@ using System.Threading.Tasks;
 
 public class Dice : MonoBehaviour
 {
-
     private Sprite[] diceSides;
 
     private SpriteRenderer rend;
 
     public static event Action<int> PlayerMove;
-
-    private int _previousMove = 0;
 
     private bool _isMouseClicked = false;
 
@@ -25,7 +22,6 @@ public class Dice : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("Mouse Clicked" + _isMouseClicked + "Player._isMoving" + Player._isMoving);
         if (_isMouseClicked || Player._isMoving)
         {
             GetComponent<BoxCollider2D>().enabled = false;
@@ -50,8 +46,6 @@ public class Dice : MonoBehaviour
 
         int randomDiceSide = 0;
 
-        int finalSide = 0;
-
         for (int i = 0; i <= 20; i++)
         {
             randomDiceSide = UnityEngine.Random.Range(0, 5);
@@ -63,10 +57,7 @@ public class Dice : MonoBehaviour
 
         }
 
-        _previousMove += randomDiceSide;
-
         PlayerMove?.Invoke(randomDiceSide);
-        finalSide = randomDiceSide + 1;
 
         _isMouseClicked = false;
     }
