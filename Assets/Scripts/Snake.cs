@@ -14,6 +14,7 @@ public class Snake : MonoBehaviour
         Debug.LogWarning(other.gameObject.transform.name);
         if (other.gameObject.CompareTag("Player"))
         {
+            Player._isMoving = true;
             DelayFall();
 
         }

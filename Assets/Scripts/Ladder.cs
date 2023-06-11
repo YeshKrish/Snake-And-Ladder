@@ -14,6 +14,7 @@ public class Ladder : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
+            Player._isMoving = true;
             DelayClimb();
             
         }

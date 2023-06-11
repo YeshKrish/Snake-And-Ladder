@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     [SerializeField]
     private GameObject _camera;
-    [SerializeField]
-    private GameObject _WinScreen;
 
     private int _nextPosition = 0;
     private bool _hasMovedOnce = false;
@@ -19,10 +17,17 @@ public class Player : MonoBehaviour
     private float _intialYDistanceBetweenPlayerAndCamera = 0f;
     private float _intialZDistanceBetweenPlayerAndCamera = 0f;
 
-    private bool _movedBack = false;
-
     public static event Action<Vector3> IncreaseCameraHeight;
     public static event Action<Vector3> DecreaseCameraHeight;
+
+    public float timeStartedLerping;
+    public float lerpTime;
+
+    private Rigidbody rb;
+    private CapsuleCollider capsuleCollider;
+
+    private float _lerpDuration = 1f; 
+    public static bool _isMoving = false;
 
     private void OnEnable()
     {
@@ -33,6 +38,9 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        capsuleCollider = GetComponent<CapsuleCollider>();
+
         //finding intial y distance
         _intialXDistanceBetweenPlayerAndCamera = MathF.Abs(transform.position.x - _camera.transform.position.x);
         _intialYDistanceBetweenPlayerAndCamera = MathF.Abs(transform.position.y - _camera.transform.position.y);
@@ -61,23 +69,18 @@ public class Player : MonoBehaviour
 
             Debug.Log("Curr" + _nextPosition + "move" + moves);
 
-            if(_nextPosition + 1 == 100)
+            if (_nextPosition + 1 == 100)
             {
-                transform.position = new Vector3(GameManager.Instance.Lands[_nextPosition].transform.position.x, GameManager.Instance.Lands[_nextPosition].transform.position.y + 2, GameManager.Instance.Lands[_nextPosition].transform.position.z);
-                CalculateYDistance(transform.position);
-                DelayedWin();
+                StartCoroutine(MovePlayerSmoothly(GameManager.Instance.Lands[_nextPosition].transform.position));
             }
-
-            if (_nextPosition >= 96 && _nextPosition <= 99 && moves >= 1 && moves <= 5)
+            else if (_nextPosition >= 96 && _nextPosition <= 99 && moves >= 1 && moves <= 5)
             {
-                transform.position = new Vector3(GameManager.Instance.Lands[_nextPosition].transform.position.x, GameManager.Instance.Lands[_nextPosition].transform.position.y + 2, GameManager.Instance.Lands[_nextPosition].transform.position.z);
-                CalculateYDistance(transform.position);
+                StartCoroutine(MovePlayerSmoothly(GameManager.Instance.Lands[_nextPosition].transform.position));
                 _hasMovedOnce = true;
             }
             else if (_nextPosition <= 95)
             {
-                transform.position = new Vector3(GameManager.Instance.Lands[_nextPosition].transform.position.x, GameManager.Instance.Lands[_nextPosition].transform.position.y + 2, GameManager.Instance.Lands[_nextPosition].transform.position.z);
-                CalculateYDistance(transform.position);
+                StartCoroutine(MovePlayerSmoothly(GameManager.Instance.Lands[_nextPosition].transform.position));
                 _hasMovedOnce = true;
             }
             else
@@ -92,6 +95,53 @@ public class Player : MonoBehaviour
         }
     }
 
+    private IEnumerator MovePlayerSmoothly(Vector3 targetPosition)
+    {
+        _isMoving = true;
+        Vector3 startPosition = transform.position;
+        float elapsedTime = 0f;
+
+        capsuleCollider.enabled = false;
+
+        Vector3 newTargetPos = new Vector3(targetPosition.x, targetPosition.y + 2, targetPosition.z);
+
+        
+        if(startPosition.y != newTargetPos.y)
+        {
+            Debug.Log("I am inside");
+            Vector3 endPosY = startPosition;
+            endPosY.y = newTargetPos.y;
+
+            while (elapsedTime < _lerpDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / _lerpDuration);
+
+                transform.position = Vector3.Lerp(startPosition, endPosY, t);
+                yield return null;
+            }
+            elapsedTime = 0f;
+        }
+
+        startPosition = transform.position;
+        while (elapsedTime < _lerpDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / _lerpDuration);
+
+            transform.position = Vector3.Lerp(startPosition, newTargetPos, t);
+            yield return null;
+        }
+
+
+        transform.position = newTargetPos;
+        _isMoving = false;
+
+        if (!_isMoving)
+        {
+            capsuleCollider.enabled = true;
+        }
+    }
 
     private void MoveForward(int moves)
     {
@@ -99,71 +149,17 @@ public class Player : MonoBehaviour
         Debug.Log("PrevPos" + previousPosition + "Moves" + (moves + 1));
         int distanceBetweenLands = Mathf.Abs(previousPosition - (moves + 1));
         _nextPosition = moves;
-        transform.position = new Vector3(GameManager.Instance.Lands[moves].transform.position.x, GameManager.Instance.Lands[moves].transform.position.y + 2, GameManager.Instance.Lands[moves].transform.position.z);
-        Debug.Log("distance" + distanceBetweenLands);
-        if(distanceBetweenLands > 25)
-        {
-            DelayedCalculateForward();
-        }
-        else
-        {
-            LateCalculateForward(); 
-        }
+        StartCoroutine(MovePlayerSmoothly(GameManager.Instance.Lands[_nextPosition].transform.position));
     }
 
-    async void LateCalculateForward()
-    {
-        Debug.Log("Late");
-        await System.Threading.Tasks.Task.Delay(50);
-        CalculateYDistance(transform.position);
-    } 
-    async void DelayedCalculateForward()
-    {
-        Debug.Log("delayed");
-        await System.Threading.Tasks.Task.Delay(2000);
-        CalculateYDistance(transform.position);
-    }
 
     private void MoveBackWard(int moves)
     {
         previousPosition = _nextPosition + 1;
         Debug.Log("PrevPos" + previousPosition + "Moves" + moves);
-        _movedBack = true;
         _nextPosition = moves;
         transform.position = new Vector3(GameManager.Instance.Lands[moves].transform.position.x, GameManager.Instance.Lands[moves].transform.position.y + 2, GameManager.Instance.Lands[moves].transform.position.z);
-        LateCalculateBackward();
-    }
-    async void LateCalculateBackward()
-    {
-        await System.Threading.Tasks.Task.Delay(50);
-        CalculateYDistance(transform.position);
-    }
-
-    async void DelayedWin()
-    {
-        await System.Threading.Tasks.Task.Delay(1000);
-        _WinScreen.SetActive(true);
-    }
-
-    private void CalculateYDistance(Vector3 currentPos)
-    {
-        float newCameraAndPlayerDistanceY = Mathf.Abs(currentPos.y - _camera.transform.position.y);
-        float newCameraAndPlayerDistanceZ = Mathf.Abs(currentPos.z - _camera.transform.position.z);
-        Debug.Log("newCamera" + newCameraAndPlayerDistanceY + "intial" + _intialYDistanceBetweenPlayerAndCamera);
-        if(newCameraAndPlayerDistanceY < _intialYDistanceBetweenPlayerAndCamera)
-        {
-            float totalDiffY = Mathf.Abs(newCameraAndPlayerDistanceY - _intialYDistanceBetweenPlayerAndCamera);
-            float totalDiffZ = Mathf.Abs(newCameraAndPlayerDistanceZ - _intialZDistanceBetweenPlayerAndCamera);
-            Vector3 total = new Vector3(0f, totalDiffY, totalDiffZ);
-            IncreaseCameraHeight?.Invoke(total);
-        }
-        if(newCameraAndPlayerDistanceY > _intialYDistanceBetweenPlayerAndCamera)
-        {
-            float totalDiffY = Mathf.Abs(newCameraAndPlayerDistanceY - _intialYDistanceBetweenPlayerAndCamera);
-            float totalDiffZ = Mathf.Abs(newCameraAndPlayerDistanceZ - _intialZDistanceBetweenPlayerAndCamera);
-            Vector3 total = new Vector3(0f, totalDiffY, totalDiffZ);
-            DecreaseCameraHeight?.Invoke(total);
-        }
+        _isMoving = false;
     }
 
     private void OnDisable()

@@ -112,6 +112,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f498204bfdeea94db9d0154fa0f20d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _camera: {fileID: 0}
+  _WinScreen: {fileID: 0}
+  timeStartedLerping: 0
+  lerpTime: 0
 --- !u!54 &6245326767032822284
 Rigidbody:
   m_ObjectHideFlags: 0

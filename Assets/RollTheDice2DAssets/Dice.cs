@@ -14,7 +14,7 @@ public class Dice : MonoBehaviour
 
     private int _previousMove = 0;
 
-    private bool _isDiceRolling = false;
+    private bool _isMouseClicked = false;
 
     private void Start()
     {
@@ -23,17 +23,30 @@ public class Dice : MonoBehaviour
         diceSides = Resources.LoadAll<Sprite>("DiceSides/");
     }
 
+    private void Update()
+    {
+        Debug.Log("Mouse Clicked" + _isMouseClicked + "Player._isMoving" + Player._isMoving);
+        if (_isMouseClicked || Player._isMoving)
+        {
+            GetComponent<BoxCollider2D>().enabled = false;
+        }
+        else
+        {
+            GetComponent<BoxCollider2D>().enabled = true;
+        }
+    }
+
 
     private void OnMouseDown()
     {
-        if (!_isDiceRolling)
+        if (!_isMouseClicked && !Player._isMoving)
         {
+            _isMouseClicked = true;
             StartCoroutine(RollTheDice());
         }
     }
     private IEnumerator RollTheDice()
     {
-        _isDiceRolling = true;
 
         int randomDiceSide = 0;
 
@@ -55,6 +68,6 @@ public class Dice : MonoBehaviour
         PlayerMove?.Invoke(randomDiceSide);
         finalSide = randomDiceSide + 1;
 
-        _isDiceRolling = false;
+        _isMouseClicked = false;
     }
 }
