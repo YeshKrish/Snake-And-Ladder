@@ -20131,6 +20131,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 407514521}
     m_Modifications:
+    - target: {fileID: 4050948321688308155, guid: a8fa66d5df3c5f248aa3527203710d93, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4e1cb17d31bd62345b8daf21b73c5e67, type: 2}
     - target: {fileID: 6245326767032822284, guid: a8fa66d5df3c5f248aa3527203710d93, type: 3}
       propertyPath: m_UseGravity
       value: 0
@@ -20195,5 +20199,9 @@ PrefabInstance:
       propertyPath: _WinScreen
       value: 
       objectReference: {fileID: 2040648218}
+    - target: {fileID: 7891915692908015342, guid: a8fa66d5df3c5f248aa3527203710d93, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: ab81c2fce2facaf419fd9c07b1442737, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a8fa66d5df3c5f248aa3527203710d93, type: 3}
